@@ -12,16 +12,17 @@ import numpy as np
 
 class Predictor:
     def __init__(self, model_path):
+        self.model_path = model_path
         self.encoder = BertTokenizer.from_pretrained(os.path.join(model_path, "vocab.txt"))
         self.sess = tf.Session()
         self.saver = tf.train.import_meta_graph(os.path.join(model_path, "model.ckpt.meta"))
         self.saver.restore(self.sess, os.path.join(model_path, "model.ckpt"))
 
+        # 获取训练数据的label_one, label_two样本，用于相似度匹配
+        self.similar_text_for_serious, self.similar_text_for_normal = self._get_label_text_from_raw_data()
+
     def predict(self, text: List[str]):
         result = []
-
-        # 获取训练数据的label_one, label_two样本，用于相似度匹配
-        list_label_one, list_label_two = self._get_label_text_from_raw_data()
 
         if text:
             # 读取用户上传数据
@@ -37,14 +38,14 @@ class Predictor:
             df_raw_data = df_raw_data[df_raw_data["预测等级"].isnull()]
 
             # 模糊匹配label_one
-            df_fuzzy_one = self._fuzzy_match(list_label_one, df_raw_data, label="严重", threshold=50)
+            df_fuzzy_one = self._fuzzy_match(self.similar_text_for_serious, df_raw_data, label="严重", threshold=50)
 
             # 原数据中过滤掉label_one
             if not df_fuzzy_one.empty:
                 df_raw_data = df_raw_data.drop(df_fuzzy_one.index)
 
             # 获取label_two的模糊匹配的预测结果
-            df_fuzzy_two = self._fuzzy_match(list_label_two, df_raw_data, label="一般", threshold=50)
+            df_fuzzy_two = self._fuzzy_match(self.similar_text_for_normal, df_raw_data, label="一般", threshold=50)
 
             # 原数据中过滤掉label_two
             if not df_fuzzy_two.empty:
@@ -111,16 +112,14 @@ class Predictor:
         """
         功能: 从训练文件中获取样本少的数据，用作模糊匹配
         """
-        raw_data_dir = "raw_data/negative_news/total.xlsx"
-        df = pd.read_excel(raw_data_dir)
+        df = pd.read_excel(os.path.join(self.model_path, "total.xlsx"))
         df = df[["负面消息内容", "影响程度"]]
         df = df.drop_duplicates()
-        # label_one ==> 严重
-        list_label_one = list(df[df["影响程度"] == "严重"]["负面消息内容"])
-        # label_two ==> 一般
-        list_label_two = list(df[df["影响程度"] == "一般"]["负面消息内容"])
 
-        return list_label_one, list_label_two
+        similar_text_for_serious = list(df[df["影响程度"] == "严重"]["负面消息内容"])
+        similar_text_for_normal = list(df[df["影响程度"] == "一般"]["负面消息内容"])
+
+        return similar_text_for_serious, similar_text_for_normal
 
     def _fuzzy_match(self, list_negative_news, df_example, label: str, threshold: int):
         """
