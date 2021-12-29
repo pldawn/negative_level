@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, Tuple
 import joblib
 import jieba
+import numpy as np
 from fuzzywuzzy import fuzz
 from rule import negative_news_rule
 import pandas as pd
@@ -93,7 +94,7 @@ class Predictor:
 
         return df_fuzzy
 
-    def _model_predict(self, text: list):
+    def _model_predict(self, text: List[str]) -> Tuple[np.array, np.array]:
         text = [" ".join(jieba.cut(x, cut_all=False)) for x in text]
         label = self.model.predict(text)  # 0:一般，1:严重,2:中等
         prob = self.model.predict_proba(text)
