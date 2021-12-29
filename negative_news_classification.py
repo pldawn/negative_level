@@ -165,8 +165,12 @@ class Predictor:
 
 
 if __name__ == "__main__":
-    my_file = ["/home/cym/Desktop/workspace/sentiment/负面消息/total.xlsx"]
-    my_model_path = "tf_negative_news"
+    my_text = [
+        "公司至今仍未发布2020年二季度偿付能力报告。",
+        "公司因批量转让不良债权资产包的首付款比例不符合规定、投资非标债权超规模限制、通过同业投资承接本行不良资产等违规行为被罚款。",
+        "公司评级结果由2019年的B级降为2020年CCC级，该公司2017年、2018年评级分别为A级、BB级，已经是连续三年下滑。"
+    ]
+    my_model_path = "model/tf_negative_news"
     agent = Predictor(my_model_path)
-    my_result = agent.predict(my_file)
+    my_result = agent.predict(my_text)
     print(my_result)
