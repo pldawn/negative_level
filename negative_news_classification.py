@@ -8,7 +8,7 @@ import os
 
 
 class Predictor:
-    def __init__(self, model_path):
+    def __init__(self, model_path="./model"):
         self.model_path = model_path
         self.model = joblib.load(os.path.join(self.model_path, "negative_news_model"))
 
@@ -107,7 +107,7 @@ if __name__ == "__main__":
         "公司因批量转让不良债权资产包的首付款比例不符合规定、投资非标债权超规模限制、通过同业投资承接本行不良资产等违规行为被罚款。",
         "公司评级结果由2019年的B级降为2020年CCC级，该公司2017年、2018年评级分别为A级、BB级，已经是连续三年下滑。"
     ]
-    my_model_path = "model"
-    agent = Predictor(my_model_path)
+
+    agent = Predictor()
     my_result = agent.predict(my_text)
     print(my_result)
