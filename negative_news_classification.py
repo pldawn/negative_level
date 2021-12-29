@@ -16,11 +16,16 @@ class Predictor:
         # 获取训练数据的label_one, label_two样本，用于相似度匹配
         self.similar_text_for_serious, self.similar_text_for_normal = self._get_similar_text()
 
-    def predict(self, text: List[str]):
+    def predict(self, text: List[str]) -> List[str]:
+        """
+        预测违约新闻的风险等级
+        :param text: List[str]，新闻列表，买个新闻都是一个字符串
+        :return: List[str]，预测结果，形状与text相同，输出每个新闻的风险等级标签
+        """
         result = []
 
         if text:
-            # 读取用户上传数据
+            # 封装数据
             df_raw_data = pd.DataFrame(text, columns=["负面消息内容"])
             df_raw_data = df_raw_data.dropna()
             df_raw_data["负面消息内容"] = df_raw_data["负面消息内容"].apply(lambda x: str(x))
