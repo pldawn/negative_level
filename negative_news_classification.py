@@ -95,7 +95,7 @@ class Predictor:
 
         df_fuzzy["预测等级"] = label
         df_fuzzy = df_fuzzy.drop(["point"], axis=1)
-        df_fuzzy = df_fuzzy.drop_duplicates(subset=["负面消息内容", "名称"])
+        df_fuzzy = df_fuzzy.drop_duplicates(subset=["负面消息内容"])
 
         return df_fuzzy
 
@@ -111,7 +111,8 @@ if __name__ == "__main__":
     my_text = [
         "公司至今仍未发布2020年二季度偿付能力报告。",
         "公司因批量转让不良债权资产包的首付款比例不符合规定、投资非标债权超规模限制、通过同业投资承接本行不良资产等违规行为被罚款。",
-        "公司评级结果由2019年的B级降为2020年CCC级，该公司2017年、2018年评级分别为A级、BB级，已经是连续三年下滑。"
+        "公司评级结果由2019年的B级降为2020年CCC级，该公司2017年、2018年评级分别为A级、BB级，已经是连续三年下滑。",
+        "1、公司2020年三季度亏损2.62亿元，前三季度累计净利润仅为0.7亿元，同比减少93.20%；前三季度累计计提资产减值损失4.26亿元，同比增长41.06%。"
     ]
 
     agent = Predictor()
